@@ -1,4 +1,5 @@
 import {sortObject, copyTextToClipboard} from './demo-utils'
+import * as HLSParser from 'hls-parser';
 
 const testStreams = require('../tests/test-streams');
 const defaultTestStreamUrl = testStreams['bbb'].url;
@@ -174,6 +175,31 @@ function trimEventHistory() {
   trimArray(events.bitrate, x);
 }
 
+
+class pLoader extends Hls.DefaultConfig.loader {
+  constructor(config) {
+    super(config);
+    var load = this.load.bind(this);
+    this.load = function (context, config, callbacks) {
+      if (context.type == 'level') {
+        var onSuccess = callbacks.onSuccess;
+        callbacks.onSuccess = function (response, stats, context) {
+          const playlist = HLSParser.parse(response.data);
+
+          // cut {
+          playlist.segments.splice(0, 5)
+          playlist.segments.splice(5, playlist.segments.length)
+          // }
+
+          response.data = HLSParser.stringify(playlist)
+          onSuccess(response, stats, context);
+        };
+      }
+      load(context, config, callbacks);
+    };
+  }
+}
+
 function loadSelectedStream() {
 
   if (!Hls.isSupported()) {
@@ -215,6 +241,10 @@ function loadSelectedStream() {
 
   if (selectedTestStream && selectedTestStream.config) {
     Object.assign(hlsConfig, selectedTestStream.config)
+  }
+
+  if ($('#streamSelect').val() == "bbbEditPlaylist") {
+    Object.assign(hlsConfig, { pLoader: pLoader })
   }
 
   if (hlsConfig.widevineLicenseUrl) {

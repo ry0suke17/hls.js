@@ -36,8 +36,17 @@ function createTestStreamWithConfig (target, config) {
 
 module.exports = {
   bbb: createTestStreamWithConfig({
-    url: 'https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8',
+    url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
     description: 'Big Buck Bunny - adaptive qualities'
+  },
+  {
+    // try to workaround test failing because of slow seek on Chrome/Win10
+    nudgeMaxRetry: 5
+  }
+  ),
+  bbbEditPlaylist: createTestStreamWithConfig({
+    url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+    description: 'Big Buck Bunny - adaptive qualities (edit playlist)'
   },
   {
     // try to workaround test failing because of slow seek on Chrome/Win10
