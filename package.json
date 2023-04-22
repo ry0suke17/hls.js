@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "eventemitter3": "3.1.0",
+    "hls-parser": "^0.10.6",
     "url-toolkit": "^2.1.6"
   },
   "devDependencies": {
